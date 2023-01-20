@@ -27,8 +27,7 @@ class LigneServiceTest {
     @Test
     void onPeutAjouterDesLignesSiPasLivre() {
         var ligne = service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_DISPONIBLE_1, 1);
-        assertNotNull(ligne.getId(),
-        "La ligne doit être enregistrée, sa clé générée"); 
+        assertNotNull(ligne.getId(), "La ligne doit être enregistrée, sa clé générée");
     }
 
     @Test
@@ -37,4 +36,5 @@ class LigneServiceTest {
             () -> service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_DISPONIBLE_1, 0),
             "La quantite d'une ligne doit être positive");
     }
+
 }

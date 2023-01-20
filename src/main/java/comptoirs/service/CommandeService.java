@@ -1,12 +1,14 @@
 package comptoirs.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import comptoirs.entity.Commande;
 
 import org.springframework.stereotype.Service;
 
 import comptoirs.dao.ClientRepository;
 import comptoirs.dao.CommandeRepository;
-import comptoirs.entity.Commande;
+import comptoirs.entity.*;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -31,6 +33,7 @@ public class CommandeService {
      * @param clientCode la clé du client
      * @return la commande créée
      */
+
     @Transactional
     public Commande creerCommande(String clientCode) {
         // On vérifie que le client existe
@@ -63,7 +66,25 @@ public class CommandeService {
      */
     @Transactional
     public Commande enregistreExpédition(Integer commandeNum) {
-        // TODO : implémenter ce service métier
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        // on vérifie que la commande existe
+        var commande = commandeDao.findById(commandeNum).orElseThrow();
+        // on vérifie que la commande n'est pas déjà expédiée
+        if(commande.getEnvoyeele() != null){
+            throw new UnsupportedOperationException("La commande a déjà été envoyée.");
+        } else { // On met à jour la date d'expédition avec la date du jour
+            commande.setEnvoyeele(LocalDate.now());
+        }
+        // On décrémente la quantité en stock de la quantité commandée
+        for (Ligne l : commande.getLignes()){
+            var produit = l.getProduit();
+            var quantite = l.getQuantite();
+            if (quantite == 0) {
+                throw new UnsupportedOperationException("Plus de " + l.getProduit() + " en stock");
+            } else {
+                produit.setUnitesEnStock(produit.getUnitesEnStock()-quantite);
+            }
+        }
+        return commande;
     }
 }
+
