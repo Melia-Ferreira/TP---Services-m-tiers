@@ -19,6 +19,7 @@ class LigneServiceTest {
     static final int REFERENCE_PRODUIT_DISPONIBLE_3 = 95;
     static final int REFERENCE_PRODUIT_DISPONIBLE_4 = 96;
     static final int REFERENCE_PRODUIT_INDISPONIBLE = 97;
+    static final int REFERENCE_PRODUIT_INEXISTANT = 123456;
     static final int UNITES_COMMANDEES_AVANT = 0;
 
     @Autowired
@@ -34,7 +35,31 @@ class LigneServiceTest {
     void laQuantiteEstPositive() {
         assertThrows(ConstraintViolationException.class, 
             () -> service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_DISPONIBLE_1, 0),
-            "La quantite d'une ligne doit être positive");
+            "La quantité doit être positive");
+    }
+   @Test
+    void CommandePasEncoreLivrée() {
+        assertThrows(Exception.class,
+                () -> service.ajouterLigne(NUMERO_COMMANDE_DEJA_LIVREE, REFERENCE_PRODUIT_DISPONIBLE_1, 1),
+                "La commande a déjà été envoyée");
+    }
+
+    @Test
+    void ProduitExiste(){
+        assertThrows(Exception.class, ()-> service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_INEXISTANT, 1 ),
+                "Le produit n'existe pas");
+    }
+
+    /*@Test
+    void ProduitDisponible(){
+        assertThrows(Exception.class, ()-> service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_INDISPONIBLE , 1 ),
+                "Le produit n'est pas disponible");
+    }*/
+
+    @Test
+    void QuantiteSuffisante(){
+        assertThrows(Exception.class, ()-> service.ajouterLigne(NUMERO_COMMANDE_PAS_LIVREE, REFERENCE_PRODUIT_DISPONIBLE_3 , 500 ),
+                "Stock insuffisant par rapport à la quantité demandé");
     }
 
 }
